@@ -55,11 +55,6 @@ cd crawler
 scrapy crawl darkweb_spider
 ```
 
-## 🔒 Security
-
-- Default Admin Credentials (Change immediately in production):
-  - Username: `admin`
-  - Password: `Password123@`
 
 ## 🤝 Contributing
 
