@@ -11,7 +11,7 @@ const LiveOperations = () => {
     useEffect(() => {
         // Connect to WebSocket
         const connectWebSocket = () => {
-            const wsUrl = '/ws/ws'; // In prod, use env vars
+            const wsUrl = '/ws'; // In prod, use env vars
             const ws = new WebSocket(wsUrl);
             wsRef.current = ws;
 

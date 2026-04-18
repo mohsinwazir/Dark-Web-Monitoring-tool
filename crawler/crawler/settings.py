@@ -59,8 +59,12 @@ DOWNLOADER_MIDDLEWARES = {
     "scrapy.downloadermiddlewares.useragent.UserAgentMiddleware": None,
     "scrapy.downloadermiddlewares.retry.RetryMiddleware": 90,
     "crawler.middlewares.DeduplicateMiddleware": 100,  # URL deduplication
+    "crawler.middlewares.TorRequestsMiddleware": 800,  # Bypass Playwright for .onion
 }
 
+ITEM_PIPELINES = {
+    "crawler.pipelines.SQLitePipeline": 300,
+}
 
 
 

@@ -7,6 +7,9 @@ from scrapy import signals
 from scrapy.exceptions import IgnoreRequest
 import hashlib
 import logging
+import requests
+import asyncio
+from scrapy.http import HtmlResponse
 
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
@@ -136,3 +139,46 @@ class CrawlerDownloaderMiddleware:
 
     def spider_opened(self, spider):
         spider.logger.info("Spider opened: %s" % spider.name)
+
+class TorRequestsMiddleware:
+    """
+    Middleware that intercepts .onion requests and downloads them using
+    the robust `requests` library configured for SOCKS5H Tor proxying,
+    bypassing Chromium/Twisted DNS limitations on Windows.
+    """
+    def __init__(self):
+        self.tor_proxy = "socks5h://127.0.0.1:9150"
+        self.proxies = {
+            "http": self.tor_proxy,
+            "https": self.tor_proxy
+        }
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls()
+
+    async def process_request(self, request, spider):
+        if not (".onion" in request.url):
+            return None 
+
+        spider.logger.info(f"[TorMw] Bypassing Playwright, fetching {request.url} via requests")
+        
+        try:
+            response = await asyncio.to_thread(
+                requests.get,
+                request.url,
+                proxies=self.proxies,
+                timeout=60,
+                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/115.0"}
+            )
+            
+            return HtmlResponse(
+                url=request.url,
+                body=response.content,
+                encoding=response.encoding or 'utf-8',
+                request=request,
+                status=response.status_code
+            )
+        except Exception as e:
+            spider.logger.error(f"[TorMw] requests fetch failed: {e}")
+            return None 

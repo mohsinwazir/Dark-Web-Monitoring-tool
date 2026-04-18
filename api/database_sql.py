@@ -3,8 +3,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# SQLite database file in the same directory
-SQLALCHEMY_DATABASE_URL = "sqlite:///./darkweb.db"
+import os
+
+# SQLite database file in the same directory (absolute path)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+SQLALCHEMY_DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'darkweb.db')}"
 
 # connect_args={"check_same_thread": False} is needed for SQLite
 engine = create_engine(

@@ -1,11 +1,13 @@
 
 import { useState, useEffect } from 'react';
-import { User, Lock, Mail, Bell, Moon, Sun, Save, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { User, Lock, Mail, Bell, Moon, Sun, Save, Loader2, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../api/apiClient';
 
 const ProfileTab = () => {
-    const { user, token } = useAuth(); // Assuming useAuth provides current user details
+    const { user, token, logout } = useAuth();
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         username: '',
         email: '',
@@ -208,6 +210,20 @@ const ProfileTab = () => {
                 </div>
 
             </form>
+
+            <div className="mt-12 pt-6 border-t border-slate-800">
+                <h3 className="text-sm font-semibold text-red-400 uppercase tracking-wider mb-4">Danger Zone</h3>
+                <button
+                    onClick={() => {
+                        logout();
+                        navigate('/login');
+                    }}
+                    className="flex items-center gap-2 bg-red-900/20 hover:bg-red-900/40 text-red-400 border border-red-900/50 px-6 py-3 rounded-xl font-semibold transition-all"
+                >
+                    <LogOut size={18} />
+                    Sign Out
+                </button>
+            </div>
         </div>
     );
 };

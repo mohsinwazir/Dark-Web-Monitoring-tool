@@ -29,7 +29,12 @@ export const AuthProvider = ({ children }) => {
             });
 
             if (!response.ok) {
-                throw new Error("Invalid credentials");
+                const errorData = await response.json().catch(() => ({}));
+                if (response.status === 401) {
+                    throw new Error("Invalid credentials");
+                } else {
+                    throw new Error(errorData.detail || `Login failed: ${response.status} ${response.statusText}`);
+                }
             }
 
             const data = await response.json();

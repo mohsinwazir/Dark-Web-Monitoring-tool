@@ -376,6 +376,34 @@ async def get_reports(limit: int = 10, current_user: User = Depends(get_current_
         })
     return {"reports": formatted}
 
+@app.get("/reports/{report_id}/pdf")
+async def download_report_pdf(report_id: str, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    report = db.query(DailyReport).filter(DailyReport.id == report_id).first()
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+    
+    try:
+        pdf_gen = get_pdf_generator()
+        
+        # Prepare data for generator
+        report_data = {
+            "timestamp": report.timestamp.isoformat(),
+            "findings_count": report.findings_count,
+            "summary": report.summary,
+            "period": report.period
+        }
+        
+        pdf_buffer = pdf_gen.generate_report_pdf(report_data)
+        
+        return StreamingResponse(
+            pdf_buffer, 
+            media_type="application/pdf", 
+            headers={"Content-Disposition": f"attachment; filename=report_{report_id[:8]}.pdf"}
+        )
+    except Exception as e:
+        logger.error(f"[API] PDF export error: {e}")
+        return JSONResponse(status_code=500, content={"message": str(e)})
+
 # --- Forensics ---
 from forensics.stego import scan_image
 from pydantic import BaseModel

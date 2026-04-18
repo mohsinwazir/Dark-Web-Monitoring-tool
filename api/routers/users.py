@@ -28,12 +28,16 @@ class UserOut(BaseModel):
     role: str
     is_active: bool
     created_at: datetime
-    # last_login: Optional[datetime] = None # Add later if tracked
+    assets: Optional[dict] = {}
     
     class Config:
         from_attributes = True
 
 # --- User Endpoints ---
+
+@router.get("/me", response_model=UserOut)
+async def read_users_me(current_user: User = Depends(get_current_user)):
+    return current_user
 
 @router.put("/me")
 async def update_user_me(
@@ -71,7 +75,49 @@ async def update_user_me(
         current_user.preferences = current_prefs
 
     db.commit()
+    db.commit()
     return {"status": "success", "message": "Profile updated"}
+
+@router.post("/me/targets")
+async def add_target_domain(
+    target: dict = Body(..., embed=False), # Expect {"target": "example.onion"}
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    domain = target.get("target")
+    if not domain:
+        raise HTTPException(status_code=400, detail="Target domain required")
+        
+    current_assets = dict(current_user.assets) if current_user.assets else {}
+    targets = set(current_assets.get("monitored_domains", []))
+    targets.add(domain)
+    
+    current_assets["monitored_domains"] = list(targets)
+    current_user.assets = current_assets
+    db.commit()
+    
+    return {"status": "success", "message": f"Added target {domain}", "targets": list(targets)}
+
+@router.delete("/me/targets")
+async def remove_target_domain(
+    target: dict = Body(..., embed=False), # Expect {"target": "example.onion"}
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    domain = target.get("target")
+    if not domain:
+        raise HTTPException(status_code=400, detail="Target domain required")
+        
+    current_assets = dict(current_user.assets) if current_user.assets else {}
+    targets = set(current_assets.get("monitored_domains", []))
+    
+    if domain in targets:
+        targets.remove(domain)
+        current_assets["monitored_domains"] = list(targets)
+        current_user.assets = current_assets
+        db.commit()
+        
+    return {"status": "success", "message": f"Removed target {domain}", "targets": list(targets)}
 
 # --- Admin Endpoints ---
 

@@ -14,7 +14,7 @@ if __name__ == "__main__":
         from main import app
         print("App imported successfully.")
         
-        uvicorn.run(app, host="127.0.0.1", port=8000, log_level="info")
+        uvicorn.run(app, host="127.0.0.1", port=8001, log_level="info")
     except Exception as e:
         print(f"Failed to start: {e}")
         import traceback

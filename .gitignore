@@ -59,10 +59,14 @@ api/diagnose.py
 api/inspect_users.py
 api/drop_users.py
 api/verify_admin_sql.py
-
+crawler/debug_*.py
+crawler/diagnose_*.py
+crawler/real_log*.txt
 # Logs and Output
 *.log
 *.txt
+!requirements.txt
+!target.txt
 api/backend_log.txt
 api/debug_output.txt
 api/tracebot.log

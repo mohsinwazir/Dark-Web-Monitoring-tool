@@ -6,7 +6,7 @@ from urllib.parse import urljoin
 def detect_tor_port():
     for port in [9050, 9150]:
         try:
-            with socket.create_connection(("127.0.0.1", port), timeout=0.8):
+            with socket.create_connection(("127.0.0.1", port), timeout=3.0):
                 return port
         except Exception:
             pass
@@ -30,6 +30,11 @@ class HybridSpider(scrapy.Spider):
         "DOWNLOAD_TIMEOUT": 40,
         "ROBOTSTXT_OBEY": False,
         "PLAYWRIGHT_BROWSER_TYPE": "chromium",
+        "PLAYWRIGHT_LAUNCH_OPTIONS": {
+            "args": [
+                "--host-resolver-rules=MAP * ~NOTFOUND , EXCLUDE .onion",
+            ]
+        },
         "FEEDS": {
             "output.csv": {
                 "format": "csv",
@@ -60,20 +65,31 @@ class HybridSpider(scrapy.Spider):
             if self.scope == "clearnet" and is_onion:
                 self.logger.info(f"Skipping {url} (Scope: Clearnet)")
                 continue
-            if self.scope == "darkweb" and not is_onion:
+            if self.scope == "darkweb" and not is_onion and "torproject.org" not in url:
                 self.logger.info(f"Skipping {url} (Scope: Darkweb)")
                 continue
 
             # TOR CHECK
-            use_tor = is_onion
+            use_tor = is_onion or "torproject.org" in url
             if use_tor and not TOR_PROXY:
                 self.logger.warning(f"Skipping .onion link (Tor not running): {url}")
                 continue
 
+            meta = {
+                "playwright": True, 
+                "depth": 0, 
+                "use_tor": use_tor,
+                "playwright_page_goto_kwargs": {"wait_until": "domcontentloaded"}
+            }
+            if use_tor and TOR_PROXY:
+                meta["playwright_context_kwargs"] = {
+                    "proxy": {"server": TOR_PROXY.replace("socks5h://", "socks5://")}
+                }
+
             yield scrapy.Request(
                 url=url,
                 callback=self.parse,
-                meta={"playwright": True, "depth": 0, "use_tor": use_tor},
+                meta=meta,
                 dont_filter=True,
             )
 
@@ -105,15 +121,28 @@ class HybridSpider(scrapy.Spider):
                 abs_links.append(abs_link)
 
         for link in abs_links[:10]:
-            print(f"       → {link}")
+            print(f"       -> {link}")
 
 
         next_depth = response.meta.get("depth", 0) + 1
         if next_depth <= 2:
             for link in abs_links:
+                is_onion = link.endswith(".onion")
+                
+                meta = {
+                    "playwright": True, 
+                    "depth": next_depth, 
+                    "use_tor": is_onion,
+                    "playwright_page_goto_kwargs": {"wait_until": "domcontentloaded"}
+                }
+                
+                if is_onion and TOR_PROXY:
+                    meta["playwright_context_kwargs"] = {
+                        "proxy": {"server": TOR_PROXY.replace("socks5h://", "socks5://")}
+                    }
                 yield scrapy.Request(
                     url=link,
                     callback=self.parse,
-                    meta={"playwright": True, "depth": next_depth, "use_tor": link.endswith(".onion")},
+                    meta=meta,
                     dont_filter=True,
                 )
