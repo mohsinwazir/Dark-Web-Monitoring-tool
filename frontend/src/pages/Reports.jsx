@@ -69,24 +69,24 @@ const Reports = () => {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold text-white flex items-center gap-2">
-                    <FileText className="text-blue-400" /> Intelligence Reports
+                    <FileText className="text-red-400" /> Intelligence Reports
                 </h1>
                 <button
                     onClick={handleCreateDummy}
-                    className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 shadow-lg shadow-indigo-900/20 transition-all"
+                    className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 shadow-lg shadow-red-900/20 transition-all"
                 >
                     <PlusCircle size={16} /> Generate Demo Report
                 </button>
             </div>
 
-            <div className="bg-slate-900/50 border border-slate-700 rounded-xl p-6">
+            <div className="bg-zinc-900/50 border border-zinc-700 rounded-xl p-6">
                 {loading ? (
-                    <div className="text-slate-400 text-center py-8">Loading reports...</div>
+                    <div className="text-zinc-400 text-center py-8">Loading reports...</div>
                 ) : reports.length === 0 ? (
-                    <div className="text-slate-400 text-center py-8">No reports generated yet.</div>
+                    <div className="text-zinc-400 text-center py-8">No reports generated yet.</div>
                 ) : (
-                    <table className="w-full text-left text-slate-300">
-                        <thead className="border-b border-slate-700 text-slate-500 uppercase text-xs">
+                    <table className="w-full text-left text-zinc-300">
+                        <thead className="border-b border-zinc-700 text-zinc-500 uppercase text-xs">
                             <tr>
                                 <th className="py-3">Report Date</th>
                                 <th className="py-3">Findings</th>
@@ -96,30 +96,30 @@ const Reports = () => {
                         </thead>
                         <tbody>
                             {reports.map((report) => (
-                                <tr key={report.id} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
-                                    <td className="py-4 font-medium text-slate-200">
-                                        {new Date(report.timestamp).toLocaleDateString()} <span className="text-slate-500 text-xs ml-1">{new Date(report.timestamp).toLocaleTimeString()}</span>
+                                <tr key={report.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
+                                    <td className="py-4 font-medium text-zinc-200">
+                                        {new Date(report.timestamp).toLocaleDateString()} <span className="text-zinc-500 text-xs ml-1">{new Date(report.timestamp).toLocaleTimeString()}</span>
                                     </td>
                                     <td className="py-4">
                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-900/30 text-red-400 border border-red-900/50">
                                             {report.findings_count} Risks
                                         </span>
                                     </td>
-                                    <td className="py-4 text-sm text-slate-400 max-w-xs truncate">
+                                    <td className="py-4 text-sm text-zinc-400 max-w-xs truncate">
                                         {report.summary}
                                     </td>
                                     <td className="py-4 text-right">
                                         <div className="flex items-center justify-end gap-2">
                                             <button
                                                 onClick={() => handleDownload(report.id)}
-                                                className="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-lg font-medium text-xs flex items-center gap-2 transition-all"
+                                                className="bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg font-medium text-xs flex items-center gap-2 transition-all"
                                                 title="Download PDF"
                                             >
                                                 <Download size={14} /> PDF
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(report.id)}
-                                                className="bg-slate-800 hover:bg-red-900/30 text-slate-400 hover:text-red-400 border border-slate-700 hover:border-red-900/50 p-1.5 rounded-lg transition-all"
+                                                className="bg-zinc-800 hover:bg-red-900/30 text-zinc-400 hover:text-red-400 border border-zinc-700 hover:border-red-900/50 p-1.5 rounded-lg transition-all"
                                                 title="Delete Report"
                                             >
                                                 <Trash2 size={14} />

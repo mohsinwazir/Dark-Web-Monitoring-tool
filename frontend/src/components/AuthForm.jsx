@@ -66,56 +66,56 @@ const AuthForm = () => {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-slate-950 font-sans">
-            <div className="w-full max-w-md p-8 bg-slate-900 rounded-2xl border border-slate-800 shadow-2xl transition-all">
+        <div className="flex min-h-screen items-center justify-center bg-black font-sans">
+            <div className="w-full max-w-md p-8 bg-zinc-900 rounded-2xl border border-zinc-800 shadow-2xl transition-all">
                 <div className="flex justify-center mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
                         <Lock className="text-white" size={32} />
                     </div>
                 </div>
                 <h2 className="text-3xl font-bold text-center text-white mb-2">
                     {isLogin ? 'Secure Access' : 'Join Intelligence'}
                 </h2>
-                <p className="text-center text-slate-500 mb-8">Dark Web Intelligence System</p>
+                <p className="text-center text-zinc-500 mb-8">Dark Web Intelligence System</p>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-slate-400 mb-2">Username</label>
+                        <label className="block text-sm font-medium text-zinc-400 mb-2">Username</label>
                         <input
                             name="username"
                             type="text"
                             value={formData.username}
                             onChange={handleChange}
-                            className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white focus:border-indigo-500 focus:outline-none"
+                            className="w-full bg-black border border-zinc-700 rounded-lg px-4 py-3 text-white focus:border-red-500 focus:outline-none"
                             required
                         />
                     </div>
 
                     {!isLogin && (
                         <div>
-                            <label className="block text-sm font-medium text-slate-400 mb-2">Email</label>
+                            <label className="block text-sm font-medium text-zinc-400 mb-2">Email</label>
                             <input
                                 name="email"
                                 type="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white focus:border-indigo-500 focus:outline-none"
+                                className="w-full bg-black border border-zinc-700 rounded-lg px-4 py-3 text-white focus:border-red-500 focus:outline-none"
                                 required
                             />
                         </div>
                     )}
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-400 mb-2">Password</label>
+                        <label className="block text-sm font-medium text-zinc-400 mb-2">Password</label>
                         <input
                             name="password"
                             type="password"
                             value={formData.password}
                             onChange={handleChange}
-                            className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white focus:border-indigo-500 focus:outline-none"
+                            className="w-full bg-black border border-zinc-700 rounded-lg px-4 py-3 text-white focus:border-red-500 focus:outline-none"
                             required
                         />
-                        {!isLogin && <p className="text-xs text-slate-500 mt-1">Min 8 chars, uppercase, lowercase, number</p>}
+                        {!isLogin && <p className="text-xs text-zinc-500 mt-1">Min 8 chars, uppercase, lowercase, number</p>}
                     </div>
 
                     {error && <p className="text-red-500 text-sm text-center">{error}</p>}
@@ -123,7 +123,7 @@ const AuthForm = () => {
 
                     <button
                         type="submit"
-                        className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg transition-colors"
+                        className="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-lg transition-colors"
                     >
                         {isLogin ? 'Sign In' : 'Create Account'}
                     </button>
@@ -136,7 +136,7 @@ const AuthForm = () => {
                             setError('');
                             setSuccess('');
                         }}
-                        className="text-slate-400 hover:text-white text-sm"
+                        className="text-zinc-400 hover:text-white text-sm"
                     >
                         {isLogin ? "Need an account? Register" : "Already have an account? Sign In"}
                     </button>

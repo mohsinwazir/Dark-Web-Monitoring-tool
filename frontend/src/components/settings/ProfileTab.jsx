@@ -76,9 +76,9 @@ const ProfileTab = () => {
     };
 
     return (
-        <div className="max-w-2xl bg-slate-900/50 p-8 rounded-2xl border border-slate-700 backdrop-blur-sm">
+        <div className="max-w-2xl bg-zinc-900/50 p-8 rounded-2xl border border-zinc-700 backdrop-blur-sm">
             <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                <User className="text-indigo-400" /> Account Settings
+                <User className="text-red-400" /> Account Settings
             </h2>
 
             {msg.text && (
@@ -90,30 +90,30 @@ const ProfileTab = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Personal Info */}
                 <div className="space-y-4">
-                    <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Personal Information</h3>
+                    <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">Personal Information</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-slate-300 text-sm mb-2">Username</label>
+                            <label className="block text-zinc-300 text-sm mb-2">Username</label>
                             <div className="relative">
-                                <User size={16} className="absolute left-3 top-3 text-slate-500" />
+                                <User size={16} className="absolute left-3 top-3 text-zinc-500" />
                                 <input
                                     name="username"
                                     value={formData.username}
                                     onChange={handleChange}
-                                    className="w-full bg-slate-950 border border-slate-700 rounded-lg pl-10 pr-4 py-2 text-white focus:border-indigo-500 focus:outline-none"
+                                    className="w-full bg-black border border-zinc-700 rounded-lg pl-10 pr-4 py-2 text-white focus:border-red-500 focus:outline-none"
                                     placeholder="Username"
                                 />
                             </div>
                         </div>
                         <div>
-                            <label className="block text-slate-300 text-sm mb-2">Email Address</label>
+                            <label className="block text-zinc-300 text-sm mb-2">Email Address</label>
                             <div className="relative">
-                                <Mail size={16} className="absolute left-3 top-3 text-slate-500" />
+                                <Mail size={16} className="absolute left-3 top-3 text-zinc-500" />
                                 <input
                                     name="email"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    className="w-full bg-slate-950 border border-slate-700 rounded-lg pl-10 pr-4 py-2 text-white focus:border-indigo-500 focus:outline-none"
+                                    className="w-full bg-black border border-zinc-700 rounded-lg pl-10 pr-4 py-2 text-white focus:border-red-500 focus:outline-none"
                                     placeholder="email@example.com"
                                 />
                             </div>
@@ -121,36 +121,36 @@ const ProfileTab = () => {
                     </div>
                 </div>
 
-                <hr className="border-slate-800" />
+                <hr className="border-zinc-800" />
 
                 {/* Security */}
                 <div className="space-y-4">
-                    <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Security</h3>
+                    <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">Security</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-slate-300 text-sm mb-2">Current Password</label>
+                            <label className="block text-zinc-300 text-sm mb-2">Current Password</label>
                             <div className="relative">
-                                <Lock size={16} className="absolute left-3 top-3 text-slate-500" />
+                                <Lock size={16} className="absolute left-3 top-3 text-zinc-500" />
                                 <input
                                     name="password"
                                     type="password"
                                     value={formData.password}
                                     onChange={handleChange}
-                                    className="w-full bg-slate-950 border border-slate-700 rounded-lg pl-10 pr-4 py-2 text-white focus:border-indigo-500 focus:outline-none"
+                                    className="w-full bg-black border border-zinc-700 rounded-lg pl-10 pr-4 py-2 text-white focus:border-red-500 focus:outline-none"
                                     placeholder="••••••••"
                                 />
                             </div>
                         </div>
                         <div>
-                            <label className="block text-slate-300 text-sm mb-2">New Password</label>
+                            <label className="block text-zinc-300 text-sm mb-2">New Password</label>
                             <div className="relative">
-                                <Lock size={16} className="absolute left-3 top-3 text-slate-500" />
+                                <Lock size={16} className="absolute left-3 top-3 text-zinc-500" />
                                 <input
                                     name="new_password"
                                     type="password"
                                     value={formData.new_password}
                                     onChange={handleChange}
-                                    className="w-full bg-slate-950 border border-slate-700 rounded-lg pl-10 pr-4 py-2 text-white focus:border-indigo-500 focus:outline-none"
+                                    className="w-full bg-black border border-zinc-700 rounded-lg pl-10 pr-4 py-2 text-white focus:border-red-500 focus:outline-none"
                                     placeholder="Leave empty to keep current"
                                 />
                             </div>
@@ -158,41 +158,41 @@ const ProfileTab = () => {
                     </div>
                 </div>
 
-                <hr className="border-slate-800" />
+                <hr className="border-zinc-800" />
 
                 {/* Preferences */}
                 <div className="space-y-4">
-                    <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Preferences</h3>
+                    <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">Preferences</h3>
                     <div className="flex flex-col gap-4">
-                        <label className="flex items-center justify-between p-3 bg-slate-950 rounded-lg border border-slate-800 cursor-pointer hover:border-slate-700 transition-colors">
+                        <label className="flex items-center justify-between p-3 bg-black rounded-lg border border-zinc-800 cursor-pointer hover:border-zinc-700 transition-colors">
                             <div className="flex items-center gap-3">
-                                <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
+                                <div className="p-2 bg-red-500/10 rounded-lg text-red-400">
                                     <Bell size={18} />
                                 </div>
-                                <span className="text-slate-200">Email Alerts</span>
+                                <span className="text-zinc-200">Email Alerts</span>
                             </div>
                             <input
                                 type="checkbox"
                                 name="pref_email_alerts"
                                 checked={formData.preferences.email_alerts}
                                 onChange={handleChange}
-                                className="w-5 h-5 accent-indigo-500 rounded"
+                                className="w-5 h-5 accent-red-500 rounded"
                             />
                         </label>
 
-                        <label className="flex items-center justify-between p-3 bg-slate-950 rounded-lg border border-slate-800 cursor-pointer hover:border-slate-700 transition-colors">
+                        <label className="flex items-center justify-between p-3 bg-black rounded-lg border border-zinc-800 cursor-pointer hover:border-zinc-700 transition-colors">
                             <div className="flex items-center gap-3">
-                                <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
+                                <div className="p-2 bg-red-500/10 rounded-lg text-red-400">
                                     <Moon size={18} />
                                 </div>
-                                <span className="text-slate-200">Dark Mode</span>
+                                <span className="text-zinc-200">Dark Mode</span>
                             </div>
                             <input
                                 type="checkbox"
                                 name="pref_dark_mode"
                                 checked={formData.preferences.dark_mode}
                                 onChange={handleChange}
-                                className="w-5 h-5 accent-indigo-500 rounded"
+                                className="w-5 h-5 accent-red-500 rounded"
                             />
                         </label>
                     </div>
@@ -202,7 +202,7 @@ const ProfileTab = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-lg shadow-indigo-900/20 disabled:opacity-70 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-lg shadow-red-900/20 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                         {loading ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
                         Save Changes
@@ -211,7 +211,7 @@ const ProfileTab = () => {
 
             </form>
 
-            <div className="mt-12 pt-6 border-t border-slate-800">
+            <div className="mt-12 pt-6 border-t border-zinc-800">
                 <h3 className="text-sm font-semibold text-red-400 uppercase tracking-wider mb-4">Danger Zone</h3>
                 <button
                     onClick={() => {

@@ -5,6 +5,7 @@ from itemadapter import ItemAdapter
 from w3lib.html import remove_tags
 import sys
 import os
+from scrapy.exceptions import DropItem
 
 # Ensure API directory matches for imports
 # Scrapy runs from project root usually? 
@@ -62,6 +63,14 @@ class SQLitePipeline:
     def process_item(self, item, spider):
         try:
             data = ItemAdapter(item).asdict()
+            url = data.get("url")
+            
+            # 1. Exact URL Deduplication (Fast)
+            if self.db:
+                existing_item = self.db.query(CrawledItem).filter(CrawledItem.url == url).first()
+                if existing_item:
+                    raise DropItem(f"Duplicate URL already exists in database: {url}")
+            
             raw_html = data.get("text") or data.get("content") or ""
             clean_text = self.clean_html(raw_html)
             
@@ -82,16 +91,27 @@ class SQLitePipeline:
             # Deduplication
             if self.faiss_manager and embedding:
                 is_dup, matched_id, _ = self.faiss_manager.is_duplicate(embedding, threshold=0.95)
-                # skipping logic if needed, but for now allow overwrite or ignore
+                if is_dup:
+                    raise DropItem(f"Semantic duplicate of item {matched_id} (FAISS Threshold > 0.95)")
             
             # Risk Calc
             risk_score = classification["score"] if classification["is_threat"] else 0.0
+            
+            # Data Pruning: Remove non-valuable data automatically
+            if risk_score < 0.05:
+                raise DropItem(f"Discarding entirely low-value item (Score {risk_score:.2f})")
+                
+            has_crypto = len(entities.get("CRYPTO", [])) > 0
+            has_dark_terms = len(entities.get("DARKWEB_TERMS", [])) > 0
+            if risk_score < 0.15 and not has_crypto and not has_dark_terms:
+                raise DropItem(f"Discarding non-threat item (Score {risk_score:.2f})")
             
             # Store in SQL
             crawled_item = CrawledItem(
                 url=data.get("url"),
                 title=data.get("title"),
-                text=nlp_cleaned[:5000],  # Limit text size
+                text=nlp_cleaned[:5000],  # Limit text size for deduplication, analysis
+                raw_html=raw_html, # Store raw HTML for frontend rendering
                 risk_score=risk_score,
                 conn_type=data.get("conn_type"),
                 depth=data.get("depth"),
@@ -114,6 +134,9 @@ class SQLitePipeline:
 
             return item
 
+        except DropItem as e:
+            logging.info(f"[Pruning] {e}")
+            raise
         except Exception as e:
             logging.error(f"[Pipeline] Failed: {e}")
             if self.db:

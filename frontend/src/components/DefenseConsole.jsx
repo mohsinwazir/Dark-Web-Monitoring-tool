@@ -45,51 +45,51 @@ const DefenseConsole = () => {
     };
 
     return (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <Shield className="text-blue-400" /> Auto-Defense Generator
+                <Shield className="text-red-400" /> Auto-Defense Generator
             </h2>
-            <p className="text-slate-400 text-sm mb-6">Create YARA rules from Indicators of Compromise (IOCs).</p>
+            <p className="text-zinc-400 text-sm mb-6">Create YARA rules from Indicators of Compromise (IOCs).</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                     <div>
-                        <label className="text-xs text-slate-500 uppercase font-bold">Threat Name</label>
+                        <label className="text-xs text-zinc-500 uppercase font-bold">Threat Name</label>
                         <input
                             value={threat}
                             onChange={e => setThreat(e.target.value)}
                             placeholder="e.g. Ransomware_BlackCat"
-                            className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white mt-1"
+                            className="w-full bg-black border border-zinc-700 rounded p-2 text-white mt-1"
                         />
                     </div>
                     <div>
-                        <label className="text-xs text-slate-500 uppercase font-bold">IOCs (comma separated)</label>
+                        <label className="text-xs text-zinc-500 uppercase font-bold">IOCs (comma separated)</label>
                         <textarea
                             value={iocs}
                             onChange={e => setIocs(e.target.value)}
                             placeholder='e.g. "bitcoin_address", "malicious_url.com"'
-                            className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-white mt-1 h-32 font-mono text-sm"
+                            className="w-full bg-black border border-zinc-700 rounded p-2 text-white mt-1 h-32 font-mono text-sm"
                         />
                     </div>
                     <button
                         onClick={generateRule}
                         disabled={typing}
-                        className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2"
+                        className="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2"
                     >
                         <Play size={16} /> GENERATE VACCINE
                     </button>
                 </div>
 
                 {/* Code Editor Preview */}
-                <div className="bg-[#1e1e1e] rounded-xl border border-slate-700 p-4 font-mono text-sm overflow-auto text-blue-100 shadow-inner relative">
-                    <div className="absolute top-2 right-2 text-xs text-slate-500 flex items-center gap-1">
+                <div className="bg-[#1e1e1e] rounded-xl border border-zinc-700 p-4 font-mono text-sm overflow-auto text-red-100 shadow-inner relative">
+                    <div className="absolute top-2 right-2 text-xs text-zinc-500 flex items-center gap-1">
                         <Code size={12} /> YARA
                     </div>
                     <pre className="whitespace-pre-wrap">
                         {rule}
                         {typing && <span className="animate-pulse">|</span>}
                     </pre>
-                    {!rule && !typing && <div className="text-slate-600 italic mt-10 text-center">Waiting for input...</div>}
+                    {!rule && !typing && <div className="text-zinc-600 italic mt-10 text-center">Waiting for input...</div>}
                 </div>
             </div>
         </div>

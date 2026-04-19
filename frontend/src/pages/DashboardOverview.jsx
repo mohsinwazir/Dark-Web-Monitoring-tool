@@ -56,44 +56,44 @@ const DashboardOverview = () => {
 
             {/* Quick Actions / Recent Alerts */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-                    <h2 className="text-lg font-semibold text-indigo-400 mb-4 flex items-center gap-2">
+                <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
+                    <h2 className="text-lg font-semibold text-red-400 mb-4 flex items-center gap-2">
                         <ShieldCheck size={18} /> Recent Alerts
                     </h2>
                     <div className="space-y-3">
                         {[1, 2, 3].map(i => (
-                            <div key={i} className="flex items-start gap-3 p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                            <div key={i} className="flex items-start gap-3 p-3 bg-zinc-800/50 rounded-lg border border-zinc-700/50">
                                 <div className="w-2 h-2 mt-2 rounded-full bg-red-500 animate-pulse"></div>
                                 <div>
-                                    <p className="text-sm font-medium text-slate-200">New Ransomware Signature Detected</p>
-                                    <p className="text-xs text-slate-500">2 minutes ago • Source: Crawler_Node_X</p>
+                                    <p className="text-sm font-medium text-zinc-200">New Ransomware Signature Detected</p>
+                                    <p className="text-xs text-zinc-500">2 minutes ago • Source: Crawler_Node_X</p>
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+                <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
                     <h2 className="text-lg font-semibold text-emerald-400 mb-4 flex items-center gap-2">
                         <Activity size={18} /> System Status
                     </h2>
                     <div className="space-y-4">
                         <div className="flex justify-between items-center text-sm">
-                            <span className="text-slate-400">Database Cluster</span>
+                            <span className="text-zinc-400">Database Cluster</span>
                             <span className="text-emerald-400 font-mono">HEALTHY (SQL)</span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
-                            <span className="text-slate-400">Crawler Nodes</span>
+                            <span className="text-zinc-400">Crawler Nodes</span>
                             <span className="text-emerald-400 font-mono">4/4 ACTIVE</span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
-                            <span className="text-slate-400">VPN Tunnel</span>
+                            <span className="text-zinc-400">VPN Tunnel</span>
                             <span className="text-yellow-400 font-mono">RE-KEYING</span>
                         </div>
-                        <div className="w-full bg-slate-800 h-2 rounded-full mt-2 overflow-hidden">
+                        <div className="w-full bg-zinc-800 h-2 rounded-full mt-2 overflow-hidden">
                             <div className="bg-emerald-500 h-full w-[85%] rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
                         </div>
-                        <p className="text-xs text-right text-slate-500 mt-1">CPU Load: 85%</p>
+                        <p className="text-xs text-right text-zinc-500 mt-1">CPU Load: 85%</p>
                     </div>
                 </div>
             </div>

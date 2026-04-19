@@ -57,6 +57,17 @@ def analyze_entities(text):
         if term in text.lower():
             result["DARKWEB_TERMS"].append(term)
 
+    # Crypto Wallet Extraction
+    btc_matches = re.findall(r'\b([13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[qzprya9x8gf2tvdw0s3jn54khce6mua7l]{39,59})\b', text)
+    xmr_matches = re.findall(r'\b(4[0-9AB][1-9A-HJ-NP-Za-km-z]{93})\b', text)
+    
+    if btc_matches or xmr_matches:
+        result["CRYPTO"] = []
+        if btc_matches:
+            result["CRYPTO"].extend([f"BTC_{w}" for w in btc_matches])
+        if xmr_matches:
+            result["CRYPTO"].extend([f"XMR_{w}" for w in xmr_matches])
+
     # remove duplicates
     for key in result:
         result[key] = list(set(result[key]))

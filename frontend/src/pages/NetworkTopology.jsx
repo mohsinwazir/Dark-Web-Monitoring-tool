@@ -7,11 +7,11 @@ const NetworkTopology = () => {
     return (
         <div className="h-full flex flex-col space-y-4">
             <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-                <Globe className="text-cyan-400" /> Network Topology
+                <Globe className="text-green-400" /> Network Topology
             </h1>
-            <p className="text-slate-400 text-sm">Interactive visualization of threat actor relationships.</p>
+            <p className="text-zinc-400 text-sm">Interactive visualization of threat actor relationships.</p>
 
-            <div className="flex-1 bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden relative shadow-inner shadow-black/50">
+            <div className="flex-1 bg-black border border-zinc-800 rounded-2xl overflow-hidden relative shadow-inner shadow-black/50">
                 {/* 3D Graph Container */}
                 <div className="absolute inset-0">
                     {/* 
@@ -22,15 +22,15 @@ const NetworkTopology = () => {
                 </div>
 
                 {/* Overlay Controls */}
-                <div className="absolute bottom-4 right-4 bg-slate-900/80 backdrop-blur border border-slate-700 p-2 rounded-lg text-xs space-y-2">
+                <div className="absolute bottom-4 right-4 bg-zinc-900/80 backdrop-blur border border-zinc-700 p-2 rounded-lg text-xs space-y-2">
                     <div className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded-full bg-blue-500"></span> Node (Entity)
+                        <span className="w-3 h-3 rounded-full bg-red-500"></span> Node (Entity)
                     </div>
                     <div className="flex items-center gap-2">
                         <span className="w-3 h-3 rounded-full bg-red-500"></span> High Risk
                     </div>
                     <div className="flex items-center gap-2">
-                        <span className="w-8 h-[1px] bg-slate-400"></span> Edge (Relation)
+                        <span className="w-8 h-[1px] bg-zinc-400"></span> Edge (Relation)
                     </div>
                 </div>
             </div>

@@ -36,7 +36,7 @@ const StegoLab = () => {
     };
 
     return (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 relative overflow-hidden">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <Eye className="text-emerald-400" /> Steganography Decoder
             </h2>
@@ -46,7 +46,7 @@ const StegoLab = () => {
                     value={url}
                     onChange={e => setUrl(e.target.value)}
                     placeholder="Enter Image URL to Analyze..."
-                    className="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-4 py-2 text-slate-200"
+                    className="flex-1 bg-black border border-zinc-700 rounded-lg px-4 py-2 text-zinc-200"
                 />
                 <button
                     onClick={handleScan}
@@ -59,7 +59,7 @@ const StegoLab = () => {
 
             {/* Preview Area */}
             {url && (
-                <div className="relative w-full h-64 bg-black/50 rounded-xl overflow-hidden flex items-center justify-center border border-slate-800">
+                <div className="relative w-full h-64 bg-black/50 rounded-xl overflow-hidden flex items-center justify-center border border-zinc-800">
                     <img src={url} alt="Target" className="h-full object-contain opacity-80" />
 
                     {/* Scanning Animation */}
@@ -71,7 +71,7 @@ const StegoLab = () => {
 
             {/* Result Box */}
             {result && (
-                <div className={`mt-6 p-4 rounded-xl border ${result.has_hidden_text ? 'bg-red-900/20 border-red-500/50' : 'bg-slate-800 border-slate-700'}`}>
+                <div className={`mt-6 p-4 rounded-xl border ${result.has_hidden_text ? 'bg-red-900/20 border-red-500/50' : 'bg-zinc-800 border-zinc-700'}`}>
                     {result.has_hidden_text ? (
                         <div>
                             <div className="flex items-center gap-2 text-red-500 font-bold mb-2">
@@ -82,7 +82,7 @@ const StegoLab = () => {
                             </div>
                         </div>
                     ) : (
-                        <div className="flex items-center gap-2 text-slate-400">
+                        <div className="flex items-center gap-2 text-zinc-400">
                             <CheckCircle size={18} /> No hidden artifacts detected.
                         </div>
                     )}
@@ -91,8 +91,8 @@ const StegoLab = () => {
 
             <style>{`
                 @keyframes scan {
-                    0% { transform: translateY(-100%); }
-                    100% { transform: translateY(100%); }
+                    0% { transform: tranzincY(-100%); }
+                    100% { transform: tranzincY(100%); }
                 }
             `}</style>
         </div>

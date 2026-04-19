@@ -15,12 +15,12 @@ const Settings = () => {
             <h1 className="text-2xl font-bold text-white mb-6">Settings</h1>
 
             {/* Tabs Navigation */}
-            <div className="flex gap-4 border-b border-slate-800 pb-1">
+            <div className="flex gap-4 border-b border-zinc-800 pb-1">
                 <button
                     onClick={() => setActiveTab('profile')}
                     className={`flex items-center gap-2 px-4 py-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'profile'
-                        ? 'border-indigo-500 text-indigo-400'
-                        : 'border-transparent text-slate-400 hover:text-slate-200'
+                        ? 'border-red-500 text-red-400'
+                        : 'border-transparent text-zinc-400 hover:text-zinc-200'
                         }`}
                 >
                     <User size={16} />
@@ -30,8 +30,8 @@ const Settings = () => {
                 <button
                     onClick={() => setActiveTab('targets')}
                     className={`flex items-center gap-2 px-4 py-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'targets'
-                        ? 'border-cyan-500 text-cyan-400'
-                        : 'border-transparent text-slate-400 hover:text-slate-200'
+                        ? 'border-green-500 text-green-400'
+                        : 'border-transparent text-zinc-400 hover:text-zinc-200'
                         }`}
                 >
                     <Target size={16} />
@@ -42,8 +42,8 @@ const Settings = () => {
                     <button
                         onClick={() => setActiveTab('users')}
                         className={`flex items-center gap-2 px-4 py-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'users'
-                            ? 'border-indigo-500 text-indigo-400'
-                            : 'border-transparent text-slate-400 hover:text-slate-200'
+                            ? 'border-red-500 text-red-400'
+                            : 'border-transparent text-zinc-400 hover:text-zinc-200'
                             }`}
                     >
                         <Shield size={16} />

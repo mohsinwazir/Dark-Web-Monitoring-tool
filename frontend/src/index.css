@@ -2,9 +2,9 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --color-dark-bg: #0f172a;
-  --color-dark-surface: #1e293b;
-  --color-dark-border: #334155;
+  --color-dark-bg: #000000;
+  --color-dark-surface: #09090b;
+  --color-dark-border: #27272a;
 
   --animate-fadeIn: fadeIn 0.5s ease-out forwards;
   --animate-pulse-slow: pulse 3s infinite;
@@ -12,12 +12,12 @@
   @keyframes fadeIn {
     0% {
       opacity: 0;
-      transform: translateY(10px);
+      transform: tranzincY(10px);
     }
 
     100% {
       opacity: 1;
-      transform: translateY(0);
+      transform: tranzincY(0);
     }
   }
 }

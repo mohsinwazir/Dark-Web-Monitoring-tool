@@ -90,16 +90,16 @@ const DashboardStats = ({ stats, startCrawl, crawlerStatus, logs }) => {
     return (
         <div className="space-y-6 animate-fadeIn">
             {/* Header Area with Action Button */}
-            <div className="flex justify-between items-center bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 backdrop-blur-sm">
+            <div className="flex justify-between items-center bg-zinc-800/50 p-6 rounded-2xl border border-zinc-700/50 backdrop-blur-sm">
                 <div>
                     <h2 className="text-3xl font-bold text-white">Threat Analytics</h2>
-                    <p className="text-slate-400">Real-time overview of crawler operations</p>
+                    <p className="text-zinc-400">Real-time overview of crawler operations</p>
                 </div>
                 <button
                     onClick={startCrawl}
                     disabled={crawlerStatus === 'running'}
                     className={`flex items-center gap-3 px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-xl ${crawlerStatus === 'running'
-                            ? 'bg-slate-700 text-slate-500 cursor-not-allowed border border-slate-600'
+                            ? 'bg-zinc-700 text-zinc-500 cursor-not-allowed border border-zinc-600'
                             : 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white shadow-green-900/40 hover:scale-105 active:scale-95'
                         }`}
                 >
@@ -114,19 +114,19 @@ const DashboardStats = ({ stats, startCrawl, crawlerStatus, logs }) => {
 
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 backdrop-blur-sm flex items-center justify-between group hover:border-blue-500/30 transition-all">
+                <div className="bg-zinc-800/50 p-6 rounded-2xl border border-zinc-700/50 backdrop-blur-sm flex items-center justify-between group hover:border-red-500/30 transition-all">
                     <div>
-                        <p className="text-slate-400 font-medium mb-1">Total URLs Scanned</p>
+                        <p className="text-zinc-400 font-medium mb-1">Total URLs Scanned</p>
                         <h3 className="text-4xl font-bold text-white tracking-tight">{stats.total || 0}</h3>
                     </div>
-                    <div className="p-4 bg-blue-500/10 rounded-xl group-hover:bg-blue-500/20 transition-colors">
-                        <Globe className="text-blue-500" size={32} />
+                    <div className="p-4 bg-red-500/10 rounded-xl group-hover:bg-red-500/20 transition-colors">
+                        <Globe className="text-red-500" size={32} />
                     </div>
                 </div>
 
-                <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 backdrop-blur-sm flex items-center justify-between group hover:border-red-500/30 transition-all">
+                <div className="bg-zinc-800/50 p-6 rounded-2xl border border-zinc-700/50 backdrop-blur-sm flex items-center justify-between group hover:border-red-500/30 transition-all">
                     <div>
-                        <p className="text-slate-400 font-medium mb-1">High Risk Sites</p>
+                        <p className="text-zinc-400 font-medium mb-1">High Risk Sites</p>
                         <h3 className="text-4xl font-bold text-red-500 tracking-tight">{highRiskCount}</h3>
                     </div>
                     <div className="p-4 bg-red-500/10 rounded-xl group-hover:bg-red-500/20 transition-colors">
@@ -134,9 +134,9 @@ const DashboardStats = ({ stats, startCrawl, crawlerStatus, logs }) => {
                     </div>
                 </div>
 
-                <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 backdrop-blur-sm flex items-center justify-between group hover:border-amber-500/30 transition-all">
+                <div className="bg-zinc-800/50 p-6 rounded-2xl border border-zinc-700/50 backdrop-blur-sm flex items-center justify-between group hover:border-amber-500/30 transition-all">
                     <div>
-                        <p className="text-slate-400 font-medium mb-1">Active Categories</p>
+                        <p className="text-zinc-400 font-medium mb-1">Active Categories</p>
                         <h3 className="text-4xl font-bold text-amber-500 tracking-tight">{stats.categories ? stats.categories.length : 0}</h3>
                     </div>
                     <div className="p-4 bg-amber-500/10 rounded-xl group-hover:bg-amber-500/20 transition-colors">
@@ -146,8 +146,8 @@ const DashboardStats = ({ stats, startCrawl, crawlerStatus, logs }) => {
             </div>
 
             {/* Main Bar Chart */}
-            <div className="bg-slate-800/50 p-8 rounded-2xl border border-slate-700/50 backdrop-blur-sm shadow-xl">
-                <h3 className="text-xl font-semibold text-slate-200 mb-6 flex items-center gap-2">
+            <div className="bg-zinc-800/50 p-8 rounded-2xl border border-zinc-700/50 backdrop-blur-sm shadow-xl">
+                <h3 className="text-xl font-semibold text-zinc-200 mb-6 flex items-center gap-2">
                     <Activity size={20} className="text-green-500" />
                     Threat Landscape (By Category)
                 </h3>
@@ -155,7 +155,7 @@ const DashboardStats = ({ stats, startCrawl, crawlerStatus, logs }) => {
                     {stats.categories && stats.categories.length > 0 ? (
                         <Bar data={chartData} options={chartOptions} />
                     ) : (
-                        <div className="h-full flex flex-col items-center justify-center text-slate-500 border border-dashed border-slate-700 rounded-xl bg-slate-800/30">
+                        <div className="h-full flex flex-col items-center justify-center text-zinc-500 border border-dashed border-zinc-700 rounded-xl bg-zinc-800/30">
                             <Activity size={48} className="mb-4 opacity-50" />
                             <p className="text-lg">No threat data available.</p>
                             <p className="text-sm mt-2">Start a crawl to generate analytics.</p>

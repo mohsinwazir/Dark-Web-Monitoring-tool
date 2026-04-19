@@ -16,7 +16,7 @@ import Settings from './pages/Settings';
 const ProtectedRoute = ({ children }) => {
   const { token, loading } = useAuth();
 
-  if (loading) return <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">Loading...</div>;
+  if (loading) return <div className="min-h-screen bg-black text-white flex items-center justify-center">Loading...</div>;
 
   if (!token) return <Navigate to="/login" replace />;
 

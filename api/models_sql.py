@@ -35,6 +35,7 @@ class CrawledItem(Base):
     url = Column(String, index=True)
     title = Column(String)
     text = Column(Text) # Main content
+    raw_html = Column(Text, nullable=True) # Full HTML to render layout
     risk_score = Column(Float, default=0.0)
     conn_type = Column(String) # Tor or Direct
     depth = Column(Integer)

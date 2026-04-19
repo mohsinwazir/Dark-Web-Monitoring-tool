@@ -79,20 +79,20 @@ const SearchBar = ({ onSearch }) => {
 
             {/* Search Input Area */}
             <div className="relative group z-10">
-                <div className={`absolute -inset-1 bg-gradient-to-r ${isPhraseMode ? 'from-purple-600 to-pink-600' : 'from-blue-600 to-cyan-600'} rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200`}></div>
-                <form onSubmit={handleSearch} className="relative flex items-center bg-slate-900 rounded-2xl p-2 border border-slate-700 shadow-2xl">
-                    <Search className="ml-4 text-slate-400" size={24} />
+                <div className={`absolute -inset-1 bg-gradient-to-r ${isPhraseMode ? 'from-red-600 to-pink-600' : 'from-red-600 to-green-600'} rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200`}></div>
+                <form onSubmit={handleSearch} className="relative flex items-center bg-zinc-900 rounded-2xl p-2 border border-zinc-700 shadow-2xl">
+                    <Search className="ml-4 text-zinc-400" size={24} />
                     <input
                         type="text"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        className="w-full bg-transparent text-white text-lg px-4 py-3 focus:outline-none placeholder-slate-500 font-medium"
+                        className="w-full bg-transparent text-white text-lg px-4 py-3 focus:outline-none placeholder-zinc-500 font-medium"
                         placeholder="Search for intelligence (e.g., 'bitcoin', 'ransomware', &quot;exact phrase&quot;)..."
                     />
 
                     {/* Phrase Mode Badge */}
                     {isPhraseMode && (
-                        <div className="hidden sm:flex items-center gap-1 bg-purple-500/10 border border-purple-500/30 text-purple-400 px-3 py-1.5 rounded-lg text-xs font-bold mr-2 whitespace-nowrap">
+                        <div className="hidden sm:flex items-center gap-1 bg-red-500/10 border border-red-500/30 text-red-400 px-3 py-1.5 rounded-lg text-xs font-bold mr-2 whitespace-nowrap">
                             <Quote size={12} /> EXACT PHRASE
                         </div>
                     )}
@@ -101,8 +101,8 @@ const SearchBar = ({ onSearch }) => {
                         type="submit"
                         disabled={loading}
                         className={`px-8 py-3 rounded-xl font-bold text-white shadow-lg transition-all ${isPhraseMode
-                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 shadow-purple-900/40'
-                            : 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 shadow-blue-900/40'
+                            ? 'bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 shadow-red-900/40'
+                            : 'bg-gradient-to-r from-red-600 to-green-600 hover:from-red-500 hover:to-green-500 shadow-red-900/40'
                             }`}
                     >
                         {loading ? 'SEARCHING...' : 'SEARCH'}
@@ -113,37 +113,37 @@ const SearchBar = ({ onSearch }) => {
             {/* Results Area */}
             <div className="space-y-4">
                 {hasSearched && results.length === 0 && !loading && (
-                    <div className="text-center py-20 bg-slate-800/30 rounded-2xl border border-dashed border-slate-700">
-                        <p className="text-slate-500 text-lg">No intelligence found for your query.</p>
+                    <div className="text-center py-20 bg-zinc-800/30 rounded-2xl border border-dashed border-zinc-700">
+                        <p className="text-zinc-500 text-lg">No intelligence found for your query.</p>
                     </div>
                 )}
 
                 {results.map((doc, idx) => (
-                    <div key={idx} className="bg-slate-800/40 backdrop-blur-md border border-slate-700 rounded-xl p-6 hover:border-blue-500/30 transition-all group shadow-lg">
+                    <div key={idx} className="bg-zinc-800/40 backdrop-blur-md border border-zinc-700 rounded-xl p-6 hover:border-red-500/30 transition-all group shadow-lg">
                         <div className="flex justify-between items-start mb-3">
                             <div className="flex items-center gap-3">
                                 <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${doc.risk_score > 0.8 ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-green-500/10 text-green-500 border border-green-500/20'
                                     }`}>
                                     {doc.label || 'GENERAL'}
                                 </span>
-                                <span className="text-slate-400 text-xs font-mono">{new Date(doc.timestamp || Date.now()).toLocaleDateString()}</span>
+                                <span className="text-zinc-400 text-xs font-mono">{new Date(doc.timestamp || Date.now()).toLocaleDateString()}</span>
                             </div>
-                            <span className={`font-mono text-sm font-bold ${doc.risk_score > 0.8 ? 'text-red-500' : 'text-slate-400'}`}>
+                            <span className={`font-mono text-sm font-bold ${doc.risk_score > 0.8 ? 'text-red-500' : 'text-zinc-400'}`}>
                                 RISK: {(doc.risk_score * 100).toFixed(0)}%
                             </span>
                         </div>
 
-                        <h3 className="text-xl font-bold text-blue-300 mb-2">{doc.title || "Untitled Document"}</h3>
+                        <h3 className="text-xl font-bold text-red-300 mb-2">{doc.title || "Untitled Document"}</h3>
 
                         {/* Security Core: SafeHTML */}
                         <SafeHTML
                             html={doc.clean_text ? doc.clean_text.substring(0, 400) + '...' : 'No content preview available.'}
-                            className="text-slate-400 text-sm leading-relaxed mb-4 line-clamp-3"
+                            className="text-zinc-400 text-sm leading-relaxed mb-4 line-clamp-3"
                         />
 
-                        <div className="flex items-center justify-between pt-4 border-t border-slate-700/50">
-                            <span className="text-xs font-mono text-slate-500 truncate max-w-md">{doc.url}</span>
-                            <a href={doc.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors">
+                        <div className="flex items-center justify-between pt-4 border-t border-zinc-700/50">
+                            <span className="text-xs font-mono text-zinc-500 truncate max-w-md">{doc.url}</span>
+                            <a href={doc.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-red-400 hover:text-red-300 transition-colors">
                                 OPEN URL <ExternalLink size={12} />
                             </a>
                         </div>

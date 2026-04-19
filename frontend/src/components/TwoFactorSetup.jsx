@@ -49,15 +49,15 @@ const TwoFactorSetup = () => {
     };
 
     return (
-        <div className="bg-slate-900/50 p-6 rounded-2xl border border-blue-500/20 backdrop-blur">
-            <h2 className="text-xl font-semibold mb-4 text-blue-400">Two-Factor Authentication</h2>
+        <div className="bg-zinc-900/50 p-6 rounded-2xl border border-red-500/20 backdrop-blur">
+            <h2 className="text-xl font-semibold mb-4 text-red-400">Two-Factor Authentication</h2>
 
             {step === 'start' && (
                 <div>
-                    <p className="text-slate-400 mb-4">Secure your account with 2FA.</p>
+                    <p className="text-zinc-400 mb-4">Secure your account with 2FA.</p>
                     <button
                         onClick={startSetup}
-                        className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg"
+                        className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg"
                     >
                         Enable 2FA
                     </button>
@@ -67,7 +67,7 @@ const TwoFactorSetup = () => {
 
             {step === 'scan' && (
                 <div className="flex flex-col items-center">
-                    <p className="text-slate-300 mb-4">Scan this QR Code with your Authenticator App:</p>
+                    <p className="text-zinc-300 mb-4">Scan this QR Code with your Authenticator App:</p>
                     <img src={qrCode} alt="2FA QR" className="rounded-lg border-4 border-white mb-6" />
 
                     <input
@@ -75,7 +75,7 @@ const TwoFactorSetup = () => {
                         value={otp}
                         onChange={(e) => setOtp(e.target.value)}
                         placeholder="Enter 6-digit Code"
-                        className="bg-slate-950 border border-slate-700 rounded-lg px-4 py-2 text-center text-xl tracking-widest text-white mb-4 w-48"
+                        className="bg-black border border-zinc-700 rounded-lg px-4 py-2 text-center text-xl tracking-widest text-white mb-4 w-48"
                         maxLength={6}
                     />
 
@@ -92,7 +92,7 @@ const TwoFactorSetup = () => {
             {step === 'done' && (
                 <div className="text-center">
                     <p className="text-green-400 text-lg mb-2">Security Level Upgraded</p>
-                    <p className="text-slate-400">Your account is now protected with 2FA.</p>
+                    <p className="text-zinc-400">Your account is now protected with 2FA.</p>
                 </div>
             )}
         </div>

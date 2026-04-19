@@ -134,14 +134,80 @@ async def search_items(
         query = query.filter(CrawledItem.risk_score >= risk_score)
         
     items = query.order_by(desc(CrawledItem.timestamp)).limit(limit).all()
-    return items
+    # Exclude raw_html from list response to save bandwidth
+    formatted = []
+    for item in items:
+        item_dict = {
+            "id": item.id,
+            "url": item.url,
+            "title": item.title,
+            "text": item.text,
+            "risk_score": item.risk_score,
+            "conn_type": item.conn_type,
+            "depth": item.depth,
+            "timestamp": item.timestamp,
+            "category": item.category,
+            "entities": item.entities,
+            "sentiment": item.sentiment,
+            "csam_flag": item.csam_flag
+        }
+        formatted.append(item_dict)
+    return formatted
+
+@app.get("/items/{item_id}")
+async def get_item_details(
+    item_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    item = db.query(CrawledItem).filter(CrawledItem.id == item_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+        
+    return {
+        "id": item.id,
+        "url": item.url,
+        "title": item.title,
+        "text": item.text,
+        "raw_html": item.raw_html,
+        "risk_score": item.risk_score,
+        "conn_type": item.conn_type,
+        "depth": item.depth,
+        "timestamp": item.timestamp,
+        "stego_hidden_text": item.stego_hidden_text,
+        "stego_image_url": item.stego_image_url,
+        "category": item.category,
+        "entities": item.entities,
+        "csam_flag": item.csam_flag
+    }
+
+import re
+import requests
+from pydantic import BaseModel
+
+def run_crawler_subprocess_global(target_scope):
+    global CRAWL_STATUS
+    logger.info(f"[Crawler] Starting subprocess (Scope: {target_scope})...")
+    try:
+        crawler_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "crawler"))
+        cmd = ["scrapy", "crawl", "crawler", "-a", f"scope={target_scope}"]
+        result = subprocess.run(cmd, cwd=crawler_dir, capture_output=True, text=True)
+        if result.returncode == 0:
+            logger.info(f"[Crawler] Success: {result.stdout[-200:]}")
+        else:
+            logger.error(f"[Crawler] Failed: {result.stderr}")
+    except Exception as ex:
+        logger.error(f"[Crawler] Subprocess error: {ex}")
+    finally:
+        CRAWL_STATUS["running"] = False
+        logger.info("[Crawler] Process finished")
 
 @app.post("/admin/crawl")
 @limiter.limit("5/minute")
 async def admin_start_crawl(
     request: Request,
     background_tasks: BackgroundTasks,
-    scope: str = "hybrid", # clearnet, darkweb, hybrid
+    scope: str = "hybrid",
     current_user: User = Depends(get_admin_user)
 ):
     global CRAWL_STATUS
@@ -150,41 +216,65 @@ async def admin_start_crawl(
         
     try:
         log_audit_event(current_user, "START_CRAWL", {"ip": request.client.host, "scope": scope}, "HIGH")
-        
-        # Update Status immediately (Optimistic UI)
         CRAWL_STATUS["running"] = True
         CRAWL_STATUS["scope"] = scope
-        
-        # Run crawler as a subprocess in background
-        def run_crawler_subprocess(target_scope):
-            global CRAWL_STATUS
-            logger.info(f"[Crawler] Starting subprocess (Scope: {target_scope})...")
-            try:
-                # Assuming api/ is CWD, crawler is at ../crawler
-                crawler_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "crawler"))
-                
-                cmd = ["scrapy", "crawl", "crawler", "-a", f"scope={target_scope}"]
-                
-                result = subprocess.run(
-                    cmd, 
-                    cwd=crawler_dir, 
-                    capture_output=True, 
-                    text=True
-                )
-                
-                if result.returncode == 0:
-                    logger.info(f"[Crawler] Success: {result.stdout[-200:]}")
-                else:
-                    logger.error(f"[Crawler] Failed: {result.stderr}")
-                    
-            except Exception as ex:
-                logger.error(f"[Crawler] Subprocess error: {ex}")
-            finally:
-                CRAWL_STATUS["running"] = False
-                logger.info("[Crawler] Process finished")
+        background_tasks.add_task(run_crawler_subprocess_global, scope)
+        return {"status": "success", "message": f"Crawler started ({scope}) in background"}
+    except Exception as e:
+        logger.error(f"[Crawler] Error: {e}")
+        return JSONResponse(status_code=500, content={"message": str(e)})
 
-        background_tasks.add_task(run_crawler_subprocess, scope)
+class SeedRequest(BaseModel):
+    seed_url: str
+
+@app.post("/admin/crawl/seed")
+@limiter.limit("5/minute")
+async def seed_crawler(
+    request: SeedRequest,
+    background_tasks: BackgroundTasks,
+    current_user: User = Depends(get_admin_user)
+):
+    global CRAWL_STATUS
+    if CRAWL_STATUS["running"]:
+        return JSONResponse(status_code=400, content={"message": "Crawl already in progress"})
+    
+    try:
+        url = request.seed_url
+        proxies = {}
+        if ".onion" in url:
+            proxies = {
+                'http': 'socks5h://127.0.0.1:9150',
+                'https': 'socks5h://127.0.0.1:9150'
+            }
         
+        resp = requests.get(url, proxies=proxies, timeout=15)
+        # Regex to find .onion links
+        regex = r"(https?://[a-zA-Z0-9.\-_]+\.onion(?:/[^\s\"\'<>]*)?)"
+        matches = re.findall(regex, resp.text)
+        
+        found_links = set(matches)
+
+        if not found_links:
+            return JSONResponse(status_code=400, content={"message": "No .onion links found in seed URL."})
+            
+        # Write to target.txt
+        crawler_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "crawler"))
+        target_path = os.path.join(crawler_dir, "target.txt")
+        
+        with open(target_path, "w") as f:
+            for link in found_links:
+                f.write(link + "\n")
+                
+        # Start crawler background task
+        log_audit_event(current_user, "START_CRAWL_SEED", {"seed": url}, "HIGH")
+        CRAWL_STATUS["running"] = True
+        CRAWL_STATUS["scope"] = "hybrid"
+        background_tasks.add_task(run_crawler_subprocess_global, "hybrid")
+        
+        return {"status": "success", "message": f"Extracted {len(found_links)} links and started crawling."}
+    except Exception as e:
+        logger.error(f"[Crawler Seed] Error: {e}")
+        return JSONResponse(status_code=500, content={"message": str(e)})        
         return {"status": "success", "message": f"Crawler started ({scope}) in background"}
     except Exception as e:
         logger.error(f"[Crawler] Error: {e}")
@@ -256,6 +346,7 @@ async def websocket_endpoint(websocket: WebSocket):
             # Let's send oldest first for "log" feel.
             for item in reversed(recent_items):
                 msg = {
+                    "id": item.id,
                     "url": item.url,
                     "title": item.title,
                     "label": item.category,
@@ -286,6 +377,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     for item in new_items:
                         # Serialize
                         msg = {
+                            "id": item.id,
                             "url": item.url,
                             "title": item.title,
                             "label": item.category,
@@ -460,9 +552,57 @@ async def get_trending():
 async def get_historical_trends():
     return {"trends": []}
     
-@app.get("/entity-graph/{entity}")
-async def get_graph(entity: str):
-    return {"nodes": [], "edges": []}
+@app.get("/entity-graph")
+async def get_graph(
+    db: Session = Depends(get_db), 
+    current_user: User = Depends(get_current_user),
+    limit: int = 50
+):
+    try:
+        items = db.query(CrawledItem).order_by(desc(CrawledItem.timestamp)).limit(limit).all()
+        nodes = []
+        edges = []
+        
+        node_ids = set()
+        
+        for item in items:
+            doc_id = f"doc_{item.id}"
+            if doc_id not in node_ids:
+                nodes.append({
+                    "id": doc_id,
+                    "name": item.title or item.url,
+                    "group": "DOCUMENT",
+                    "url": item.url,
+                    "risk_score": item.risk_score
+                })
+                node_ids.add(doc_id)
+            
+            if item.entities and isinstance(item.entities, dict):
+                for ent_type, ent_list in item.entities.items():
+                    # Limit to specific groups to avoid noise
+                    if ent_type not in ["PERSON", "ORG", "LOC", "CRYPTO"]:
+                        continue
+                        
+                    for ent_val in ent_list:
+                        ent_id = f"ent_{ent_type}_{ent_val}"
+                        if ent_id not in node_ids:
+                            nodes.append({
+                                "id": ent_id,
+                                "name": ent_val,
+                                "group": ent_type
+                            })
+                            node_ids.add(ent_id)
+                        
+                        edges.append({
+                            "source": doc_id,
+                            "target": ent_id,
+                            "label": "MENTIONS"
+                        })
+                        
+        return {"nodes": nodes, "edges": edges}
+    except Exception as e:
+        logger.error(f"[Graph] Error: {e}")
+        return JSONResponse(status_code=500, content={"message": str(e)})
 
 
 if __name__ == "__main__":

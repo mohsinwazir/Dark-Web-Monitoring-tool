@@ -25,7 +25,7 @@ class HybridSpider(scrapy.Spider):
     name = "crawler"
 
     custom_settings = {
-        "DEPTH_LIMIT": 2,
+        "DEPTH_LIMIT": 4,
         "LOG_LEVEL": "INFO",
         "DOWNLOAD_TIMEOUT": 40,
         "ROBOTSTXT_OBEY": False,
@@ -90,7 +90,7 @@ class HybridSpider(scrapy.Spider):
                 url=url,
                 callback=self.parse,
                 meta=meta,
-                dont_filter=True,
+                dont_filter=False,
             )
 
     async def parse(self, response):
@@ -110,6 +110,7 @@ class HybridSpider(scrapy.Spider):
             "text": text,
             "conn_type": conn_type,
             "depth": response.meta.get("depth", 0),
+            "raw_html": response.text
         }
 
 
@@ -125,8 +126,13 @@ class HybridSpider(scrapy.Spider):
 
 
         next_depth = response.meta.get("depth", 0) + 1
-        if next_depth <= 2:
+        if next_depth <= 4:
             for link in abs_links:
+                # Skip irrelevant about/contact/policy pages to save depth
+                lower_link = link.lower()
+                if any(term in lower_link for term in ["about", "contact", "privacy", "terms", "faq", "help"]):
+                    continue
+                    
                 is_onion = link.endswith(".onion")
                 
                 meta = {
@@ -144,5 +150,5 @@ class HybridSpider(scrapy.Spider):
                     url=link,
                     callback=self.parse,
                     meta=meta,
-                    dont_filter=True,
+                    dont_filter=False,
                 )

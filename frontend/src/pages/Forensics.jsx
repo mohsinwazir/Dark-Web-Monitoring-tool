@@ -6,7 +6,7 @@ const Forensics = () => {
     return (
         <div className="space-y-8">
             <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-                <Microscope className="text-purple-400" /> Digital Forensics Lab
+                <Microscope className="text-red-400" /> Digital Forensics Lab
             </h1>
 
             <div className="grid grid-cols-1 gap-8">
@@ -14,7 +14,7 @@ const Forensics = () => {
                 <section>
                     <div className="flex items-center gap-2 mb-4">
                         <span className="bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded text-xs font-bold border border-emerald-500/20">MODULE 01</span>
-                        <h3 className="text-slate-300 font-semibold">Hidden Layer Detection</h3>
+                        <h3 className="text-zinc-300 font-semibold">Hidden Layer Detection</h3>
                     </div>
                     <StegoLab />
                 </section>
@@ -22,8 +22,8 @@ const Forensics = () => {
                 {/* Module 2: YARA */}
                 <section>
                     <div className="flex items-center gap-2 mb-4">
-                        <span className="bg-blue-500/10 text-blue-400 px-2 py-1 rounded text-xs font-bold border border-blue-500/20">MODULE 02</span>
-                        <h3 className="text-slate-300 font-semibold">Active Defense Generation</h3>
+                        <span className="bg-red-500/10 text-red-400 px-2 py-1 rounded text-xs font-bold border border-red-500/20">MODULE 02</span>
+                        <h3 className="text-zinc-300 font-semibold">Active Defense Generation</h3>
                     </div>
                     <DefenseConsole />
                 </section>
