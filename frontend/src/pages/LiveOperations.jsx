@@ -11,7 +11,8 @@ const LiveOperations = () => {
     useEffect(() => {
         // Connect to WebSocket
         const connectWebSocket = () => {
-            const wsUrl = 'ws://127.0.0.1:8001/ws'; // Force explicit backend port
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws`; // Use relative proxy
             const ws = new WebSocket(wsUrl);
             wsRef.current = ws;
 

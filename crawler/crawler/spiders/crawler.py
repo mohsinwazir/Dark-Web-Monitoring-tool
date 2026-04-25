@@ -1,6 +1,7 @@
 import scrapy
 import socket
 from urllib.parse import urljoin
+from scrapy_playwright.page import PageMethod
 
 
 def detect_tor_port():
@@ -25,14 +26,20 @@ class HybridSpider(scrapy.Spider):
     name = "crawler"
 
     custom_settings = {
-        "DEPTH_LIMIT": 4,
+        "DEPTH_LIMIT": 0,
         "LOG_LEVEL": "INFO",
-        "DOWNLOAD_TIMEOUT": 40,
+        "DOWNLOAD_TIMEOUT": 120,           # 120s for slow .onion sites
+        "CONCURRENT_REQUESTS": 1,           # One at a time to avoid overloading
+        "DOWNLOAD_DELAY": 2,                # 2s polite delay
         "ROBOTSTXT_OBEY": False,
         "PLAYWRIGHT_BROWSER_TYPE": "chromium",
+        "PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT": 120000,  # 120s nav timeout
         "PLAYWRIGHT_LAUNCH_OPTIONS": {
+            "headless": True,
             "args": [
                 "--host-resolver-rules=MAP * ~NOTFOUND , EXCLUDE .onion",
+                "--no-sandbox",
+                "--disable-gpu",
             ]
         },
         "FEEDS": {
@@ -85,6 +92,13 @@ class HybridSpider(scrapy.Spider):
                 meta["playwright_context_kwargs"] = {
                     "proxy": {"server": TOR_PROXY.replace("socks5h://", "socks5://")}
                 }
+            
+            # Special handling for Dread (DDoS protection session creation queue)
+            if "dreadytofatroptsdj6io7l3xptbet6onoyno2yv7jicoxknyazubrad" in url:
+                self.logger.info(f"Injecting 30s wait for Dread session creation: {url}")
+                meta["playwright_page_coroutines"] = [
+                    PageMethod("wait_for_timeout", 30000)
+                ]
 
             yield scrapy.Request(
                 url=url,
@@ -93,16 +107,50 @@ class HybridSpider(scrapy.Spider):
                 dont_filter=False,
             )
 
+    def _is_onion_url(self, url):
+        """Strict check — only allow .onion hidden services."""
+        try:
+            from urllib.parse import urlparse
+            host = urlparse(url).hostname or ""
+            return host.endswith(".onion")
+        except Exception:
+            return False
+
+    # Skip binary/asset URLs — only crawl HTML pages
+    SKIP_EXTENSIONS = (
+        '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webp',
+        '.pdf', '.zip', '.tar', '.gz', '.mp4', '.mp3', '.avi',
+        '.css', '.js', '.woff', '.woff2', '.ttf', '.eot',
+    )
+
+    def _is_html_url(self, url):
+        from urllib.parse import urlparse
+        path = urlparse(url).path.lower()
+        return not any(path.endswith(ext) for ext in self.SKIP_EXTENSIONS)
+
     async def parse(self, response):
         url = response.url
+
+        # Hard block: discard any clearnet page that slipped through
+        if not self._is_onion_url(url):
+            self.logger.info(f"[BLOCKED] Clearnet URL discarded: {url}")
+            return
+
+        # Hard block: skip binary/asset files
+        if not self._is_html_url(url):
+            self.logger.info(f"[BLOCKED] Binary/asset URL skipped: {url}")
+            return
+
         conn_type = "Tor" if response.meta.get("use_tor") else "Direct"
         title = response.xpath("//title/text()").get(default="No Title").strip()
+        # Unlimited character capture
         text = " ".join(response.xpath("//body//text()").getall()).strip().replace("\n", " ")
-        text = " ".join(text.split())[:500] 
+        text = " ".join(text.split())
 
+        safe_title = title.encode("ascii", "ignore").decode()
         print(f"\n[+] Crawled: {url}")
-        print(f"    [{conn_type}] Title: {title}")
-        print(f"    --- Text (first 500 chars) ---\n{text}\n{'-'*70}")
+        print(f"    [{conn_type}] Title: {safe_title}")
+        print(f"    Text length: {len(text)} chars")
 
         yield {
             "url": url,
@@ -115,40 +163,44 @@ class HybridSpider(scrapy.Spider):
 
 
         links = response.css("a::attr(href)").getall()
-        abs_links = []
+        abs_links_filtered = []
         for link in links:
             abs_link = urljoin(response.url, link)
-            if abs_link.startswith("http"):
-                abs_links.append(abs_link)
+            # STRICT FILTER: Only follow .onion hidden service HTML links
+            if self._is_onion_url(abs_link) and self._is_html_url(abs_link):
+                abs_links_filtered.append(abs_link)
 
-        for link in abs_links[:10]:
-            print(f"       -> {link}")
-
+        self.logger.info(f"    Found {len(abs_links_filtered)} valid .onion links to follow")
 
         next_depth = response.meta.get("depth", 0) + 1
-        if next_depth <= 4:
-            for link in abs_links:
-                # Skip irrelevant about/contact/policy pages to save depth
-                lower_link = link.lower()
-                if any(term in lower_link for term in ["about", "contact", "privacy", "terms", "faq", "help"]):
-                    continue
-                    
-                is_onion = link.endswith(".onion")
-                
-                meta = {
-                    "playwright": True, 
-                    "depth": next_depth, 
-                    "use_tor": is_onion,
-                    "playwright_page_goto_kwargs": {"wait_until": "domcontentloaded"}
+        
+        for link in abs_links_filtered:
+            # Skip irrelevant boilerplate pages
+            lower_link = link.lower()
+            if any(term in lower_link for term in ["about", "contact", "privacy", "terms", "faq", "help", "login", "register"]):
+                continue
+
+            meta = {
+                "playwright": True,
+                "depth": next_depth,
+                "use_tor": True,  # All .onion links require Tor
+                "playwright_page_goto_kwargs": {"wait_until": "domcontentloaded"}
+            }
+
+            if TOR_PROXY:
+                meta["playwright_context_kwargs"] = {
+                    "proxy": {"server": TOR_PROXY.replace("socks5h://", "socks5://")}
                 }
-                
-                if is_onion and TOR_PROXY:
-                    meta["playwright_context_kwargs"] = {
-                        "proxy": {"server": TOR_PROXY.replace("socks5h://", "socks5://")}
-                    }
-                yield scrapy.Request(
-                    url=link,
-                    callback=self.parse,
-                    meta=meta,
-                    dont_filter=False,
-                )
+
+            # Special handling for Dread (DDoS protection session creation queue)
+            if "dreadytofatroptsdj6io7l3xptbet6onoyno2yv7jicoxknyazubrad" in link:
+                meta["playwright_page_coroutines"] = [
+                    PageMethod("wait_for_timeout", 30000)
+                ]
+
+            yield scrapy.Request(
+                url=link,
+                callback=self.parse,
+                meta=meta,
+                dont_filter=False,
+            )

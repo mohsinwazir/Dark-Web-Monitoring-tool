@@ -60,57 +60,94 @@ class SQLitePipeline:
         text = re.sub(r"\s+", " ", text)
         return text.strip()
 
+    # Known safe/legitimate dark web services & indexers — never threat intel
+    SAFE_DOMAINS = [
+        "duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion",  # DDG
+        "torlinksge6enmcyyuxjpgcgvn5sx3p5mkyfjto5wefl55cwzxtw3oqd.onion",  # TorLinks
+        "answerszuvs3gg2l64e6hmnryudl5zgrmwm3vh65hzszdghbldbpvqrad.onion",  # Hidden Answers
+        # NOTE: Ahmia search results ARE allowed - only homepage/legal blocked via title filter
+    ]
+
+    # Page titles that signal boilerplate/admin pages — no threat value
+    BOILERPLATE_TITLES = [
+        "legal disclaimer", "terms of service", "terms and conditions",
+        "privacy policy", "about ahmia", "about us", "cookie policy",
+        "contact us", "faq", "help center", "add service", "register",
+        "sign in", "login", "captcha", "access denied", "403 forbidden",
+        "404 not found", "error", "maintenance",
+    ]
+
+    # Text patterns that indicate PROTECTIVE/informational context (not criminal)
+    PROTECTIVE_PHRASES = [
+        "we have not deployed", "content warning: the indexed sites",
+        "not responsible for them", "blocks websites that contain",
+        "filter child sexual abuse material from your own",
+        "right onion address starts with", "man-in-the-middle fake clone",
+        "legal disclaimer", "this is a research", "for educational purposes",
+        "checksum from an onion address", "md5 sum of the onion domain",
+    ]
+
     def process_item(self, item, spider):
         try:
             data = ItemAdapter(item).asdict()
-            url = data.get("url")
-            
+            url = data.get("url", "")
+            title = (data.get("title") or "").lower().strip()
+
             # 1. Exact URL Deduplication (Fast)
             if self.db:
                 existing_item = self.db.query(CrawledItem).filter(CrawledItem.url == url).first()
                 if existing_item:
                     raise DropItem(f"Duplicate URL already exists in database: {url}")
-            
+
+            # 2. Pre-filter: Drop known safe indexers immediately (no AI needed)
+            from urllib.parse import urlparse
+            host = (urlparse(url).hostname or "").lower()
+            if any(safe in host for safe in self.SAFE_DOMAINS):
+                raise DropItem(f"Dropping known safe indexer/search service: {url}")
+
+            # 3. Pre-filter: Drop boilerplate/admin page titles
+            if any(bp in title for bp in self.BOILERPLATE_TITLES):
+                raise DropItem(f"Dropping boilerplate page by title: '{title}'")
+
             raw_html = data.get("text") or data.get("content") or ""
             clean_text = self.clean_html(raw_html)
-            
+
+            # 4. Pre-filter: Drop pages with protective/informational language
+            clean_lower = clean_text.lower()
+            if any(phrase in clean_lower for phrase in self.PROTECTIVE_PHRASES):
+                raise DropItem(f"Dropping informational/protective-context page: {url}")
+
             # NLP
             nlp_cleaned = nlp_clean_text(clean_text)
             entities = analyze_entities(nlp_cleaned)
-            
+
             # Forensics (Stego - Simple check on raw html for demo)
             stego_hidden = None
             stego_image = None
-            
+
             # Classification
             classification = classify_document(nlp_cleaned)
-            
+
             # Embedding
             embedding = get_embedding(nlp_cleaned)
-            
+
             # Deduplication
             if self.faiss_manager and embedding:
                 is_dup, matched_id, _ = self.faiss_manager.is_duplicate(embedding, threshold=0.95)
                 if is_dup:
                     raise DropItem(f"Semantic duplicate of item {matched_id} (FAISS Threshold > 0.95)")
-            
+
             # Risk Calc
             risk_score = classification["score"] if classification["is_threat"] else 0.0
-            
-            # Data Pruning: Remove non-valuable data automatically
-            if risk_score < 0.05:
-                raise DropItem(f"Discarding entirely low-value item (Score {risk_score:.2f})")
-                
-            has_crypto = len(entities.get("CRYPTO", [])) > 0
-            has_dark_terms = len(entities.get("DARKWEB_TERMS", [])) > 0
-            if risk_score < 0.15 and not has_crypto and not has_dark_terms:
-                raise DropItem(f"Discarding non-threat item (Score {risk_score:.2f})")
-            
+
+            # Data Pruning: Removed temporarily to ensure maximum data collection
+            # (All data will be saved regardless of risk score)
+
             # Store in SQL
             crawled_item = CrawledItem(
                 url=data.get("url"),
                 title=data.get("title"),
-                text=nlp_cleaned[:5000],  # Limit text size for deduplication, analysis
+                text=nlp_cleaned,  # No text size limit
                 raw_html=raw_html, # Store raw HTML for frontend rendering
                 risk_score=risk_score,
                 conn_type=data.get("conn_type"),

@@ -45,11 +45,11 @@ const Reports = () => {
 
     const handleCreateDummy = async () => {
         try {
-            await api.post('/reports/dummy');
+            await api.post('/generate-report');
             fetchReports(); // Refresh list
         } catch (err) {
-            console.error("Dummy creation failed:", err);
-            alert("Failed to create dummy report");
+            console.error("Report generation failed:", err);
+            alert("Failed to create report");
         }
     };
 

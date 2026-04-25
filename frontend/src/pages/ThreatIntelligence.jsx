@@ -137,10 +137,15 @@ const ThreatIntelligence = () => {
                                 className="bg-black border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-300 focus:outline-none"
                             >
                                 <option value="All">All Categories</option>
-                                <option value="Drugs">Drugs</option>
-                                <option value="Weapons">Weapons</option>
-                                <option value="Financial">Financial Fraud</option>
-                                <option value="Human Trafficking">Human Trafficking</option>
+                                <option value="illicit narcotics trading">Drugs & Narcotics</option>
+                                <option value="counterfeit documents & id">Fake Docs & ID</option>
+                                <option value="guns-for-sale">Weapons</option>
+                                <option value="Finance">Financial Fraud</option>
+                                <option value="Hacking">Hacking Services</option>
+                                <option value="cybersecurity education & defense">Cyber Education</option>
+                                <option value="forum discussion & community">Forums</option>
+                                <option value="news & journalism">News</option>
+                                <option value="uncertain">Uncertain/Other</option>
                             </select>
 
                             <select

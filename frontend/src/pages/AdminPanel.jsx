@@ -3,6 +3,7 @@ import { ShieldAlert, Activity, Database, Lock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useState, useEffect } from 'react';
 import MitreHeatmap from '../components/MitreHeatmap';
+import { api } from '../api/apiClient';
 
 const AdminPanel = () => {
     const { token, logout } = useAuth(); // Added logout
@@ -19,21 +20,13 @@ const AdminPanel = () => {
         setStatusMsg('Initiating Global Crawl...');
 
         try {
-            const response = await fetch(`/api/admin/crawl?scope=${scope}`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            const data = await response.json();
-            if (response.ok) {
-                setStatusMsg('✅ ' + data.message);
-            } else {
-                setStatusMsg('❌ Error: ' + data.detail);
-                setCrawling(false);
-            }
+            const response = await api.post(`/admin/crawl?scope=${scope}`);
+            const data = response.data;
+            setStatusMsg('✅ ' + data.message);
         } catch (err) {
-            setStatusMsg('❌ Connection Failed');
+            const detail = err.response?.data?.detail || err.message;
+            setStatusMsg('❌ Error: ' + detail);
+            if (detail.includes("Connection")) setStatusMsg('❌ Connection Failed');
             setCrawling(false);
         }
     };
@@ -42,10 +35,8 @@ const AdminPanel = () => {
     useEffect(() => {
         const checkStatus = async () => {
             try {
-                const response = await fetch('/api/admin/crawl/status', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await response.json();
+                const response = await api.get('/admin/crawl/status');
+                const data = response.data;
 
                 if (data.running) {
                     setCrawling(true);

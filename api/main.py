@@ -496,6 +496,20 @@ async def download_report_pdf(report_id: str, current_user: User = Depends(get_c
         logger.error(f"[API] PDF export error: {e}")
         return JSONResponse(status_code=500, content={"message": str(e)})
 
+@app.delete("/reports/{report_id}")
+async def delete_report(report_id: str, current_user: User = Depends(get_admin_user), db: Session = Depends(get_db)):
+    report = db.query(DailyReport).filter(DailyReport.id == report_id).first()
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+    
+    try:
+        db.delete(report)
+        db.commit()
+        return {"status": "success", "message": "Report deleted"}
+    except Exception as e:
+        logger.error(f"[API] Report delete error: {e}")
+        return JSONResponse(status_code=500, content={"message": str(e)})
+
 # --- Forensics ---
 from forensics.stego import scan_image
 from pydantic import BaseModel
